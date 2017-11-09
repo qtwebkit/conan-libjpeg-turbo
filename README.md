@@ -1,47 +1,52 @@
-[![Build Status](https://travis-ci.org/lasote/conan-libjpeg-turbo.svg)](https://travis-ci.org/lasote/conan-libjpeg-turbo)
+[![Download](https://api.bintray.com/packages/bincrafters/public-conan/libjpeg-turbo%3Abincrafters/images/download.svg?version=1.5.2%3Astable) ](https://bintray.com/bincrafters/public-conan/libjpeg-turbo%3Abincrafters/1.5.2%3Astable/link)
+[![Build Status](https://travis-ci.org/bincrafters/conan-libjpeg-turbo.svg?branch=stable%2F1.5.2)](https://travis-ci.org/bincrafters/conan-libjpeg-turbo)
+[![Build status](https://ci.appveyor.com/api/projects/status/a5snyovachh6e8nh?svg=true)](https://ci.appveyor.com/project/BinCrafters/conan-libjpeg-turbo)
 
+Brief statement describing libjpeg-turbo
 
-# conan-libjpeg-turbo
+[Conan.io](https://conan.io) package for [libjpeg-turbo](https://github.com/someauthor/libjpeg-turbo) project
 
-[Conan.io](https://conan.io) package for lib libjpeg-turbo library.
+The packages generated with this **conanfile** can be found in [Bintray](https://bintray.com/bincrafters/public-conan/libjpeg-turbo%3Abincrafters).
 
-Thanks to @a-teammate for his contribution.
-
-The packages generated with this **conanfile** can be found in [conan.io](https://conan.io/source/libjpeg-turbo/1.5.1/lasote/stable).
-
-## Build packages
-
-Download conan client from [Conan.io](https://conan.io) and run:
-
-    $ python build.py
-
-## Upload packages to server
-
-    $ conan upload libjpeg-turbo/1.5.1@lasote/stable --all
-    
-## Reuse the packages
+## For Users: Use this package
 
 ### Basic setup
 
-    $ conan install libjpeg-turbo/1.5.1@lasote/stable
-    
+    $ conan install libjpeg-turbo/1.5.2@bincrafters/stable
+
 ### Project setup
 
 If you handle multiple dependencies in your project is better to add a *conanfile.txt*
-    
-    [requires]
-    libjpeg-turbo/1.5.1@lasote/stable
 
-    [options]
-    libjpeg-turbo:shared=true # false
-    
+    [requires]
+    libjpeg-turbo/1.5.2@bincrafters/stable
+
     [generators]
     txt
-    cmake
 
-Complete the installation of requirements for your project running:</small></span>
+Complete the installation of requirements for your project running:
 
-    conan install . 
+    $ mkdir build && cd build && conan install ..
 
-Project setup installs the library (and all his dependencies) and generates the files *conanbuildinfo.txt* and *conanbuildinfo.cmake* with all the paths and variables that you need to link with your dependencies.
+Note: It is recommended that you run conan install from a build directory and not the root of the project directory.  This is because conan generates *conanbuildinfo* files specific to a single build configuration which by default comes from an autodetected default profile located in ~/.conan/profiles/default .  If you pass different build configuration options to conan install, it will generate different *conanbuildinfo* files.  Thus, they should not be added to the root of the project, nor committed to git.
 
+## For Packagers: Publish this Package
+
+The example below shows the commands used to publish to bincrafters conan repository. To publish to your own conan respository (for example, after forking this git repository), you will need to change the commands below accordingly.
+
+## Build and package
+
+The following command both runs all the steps of the conan file, and publishes the package to the local system cache.  This includes downloading dependencies from "build_requires" and "requires" , and then running the build() method.
+
+    $ conan create bincrafters/stable
+
+## Add Remote
+
+    $ conan remote add bincrafters "https://api.bintray.com/conan/bincrafters/public-conan"
+
+## Upload
+
+    $ conan upload libjpeg-turbo/1.5.2@bincrafters/stable --all -r bincrafters
+
+## License
+[LICENSE_TYPE](LICENSE)
