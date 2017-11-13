@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from conans import ConanFile, CMake, ConfigureEnvironment, tools
+from conans import ConanFile, CMake, AutoToolsBuildEnvironment, tools
 import os
 
 
@@ -14,8 +14,9 @@ class LibJpegTurboConan(ConanFile):
     options = {"shared": [True, False], "fPIC": [True, False], "SSE": [True, False]}
     default_options = "shared=False", "fPIC=True", "SSE=True"
     exports = "CMakeLists.txt"
-    url="http://github.com/bincrafters/conan-libjpeg-turbo"
-    license="https://github.com/libjpeg-turbo/libjpeg-turbo/blob/%s/LICENSE.txt" % version
+    url = "http://github.com/bincrafters/conan-libjpeg-turbo"
+    license = "https://github.com/libjpeg-turbo/libjpeg-turbo/blob/%s/LICENSE.txt" % version
+    install = "libjpeg-turbo-install"
     
     def config(self):
         del self.settings.compiler.libcxx 
@@ -29,53 +30,58 @@ class LibJpegTurboConan(ConanFile):
         archive_prefix = "/" + self.version + "/"
         archive_name = self.name + "-" + self.version
         archive_ext = ".tar.gz"
-        download_url =  download_url_base + archive_prefix + archive_name + archive_ext
+        download_url = download_url_base + archive_prefix + archive_name + archive_ext
         self.output.info("trying download of url: " + download_url)
         tools.get(download_url)
         os.rename(archive_name, "sources")
 
-    def build(self):
+    def build_configure(self):
+        prefix = os.path.abspath(self.install)
         with tools.chdir("sources"):
-            env = ConfigureEnvironment(self)
-            if self.settings.os == "Linux" or self.settings.os == "Macos":
-                if self.options.fPIC:
-                    env_line = env.command_line.replace('CFLAGS="', 'CFLAGS="-fPIC ')
-                else:
-                    env_line = env.command_line
-                self.run("autoreconf -fiv")
-                config_options = ""
-                if self.settings.arch == "x86":
-                    if self.settings.os == "Linux":
-                        config_options = "--host i686-pc-linux-gnu CFLAGS='-O3 -m32' LDFLAGS=-m32"
-                    else:
-                        config_options = "--host i686-apple-darwin CFLAGS='-O3 -m32' LDFLAGS=-m32"
-
-                if self.settings.os == "Macos":
-                    old_str = r'-install_name \$rpath/\$soname'
-                    new_str = r'-install_name \$soname'
-                    tools.replace_in_file("configure", old_str, new_str)
-
-                self.run("%s ./configure %s" % (env_line, config_options))
-                self.run("%s make" % (env_line))
+            env_build = AutoToolsBuildEnvironment(self)
+            env_build.fpic = self.options.fPIC
+            args = ['--prefix=%s' % prefix]
+            if self.options.shared:
+                args.extend(['--disable-static', '--enable-shared'])
             else:
-                # Don't mess with runtime conan already set
-                tools.replace_in_file("CMakeLists.txt", 'string(REGEX REPLACE "/MD" "/MT" ${var} "${${var}}")', "")
-                tools.replace_in_file("sharedlib/CMakeLists.txt", 'string(REGEX REPLACE "/MT" "/MD" ${var} "${${var}}")', "")
-                
-                cmake_options = []
-                if self.options.shared == True:
-                    cmake_options.append("-DENABLE_STATIC=0 -DENABLE_SHARED=1")
-                else:
-                    cmake_options.append("-DENABLE_SHARED=0 -DENABLE_STATIC=1")
-                cmake_options.append("-DWITH_SIMD=%s" % "1" if self.options.SSE else "0")
-                
-                cmake = CMake(self.settings)
-                self.run("mkdir _build" )
-                cd_build = "cd _build"
+                args.extend(['--disable-shared', '--enable-static'])
 
-                self.run('%s && %s && cmake .. %s %s' % (env.command_line, cd_build, cmake.command_line, " ".join(cmake_options)))
-                self.run("%s && %s && cmake --build . %s" % (env.command_line, cd_build, cmake.build_config))
-                
+            if self.settings.os == "Macos":
+                old_str = r'-install_name \$rpath/\$soname'
+                new_str = r'-install_name \$soname'
+                tools.replace_in_file("configure", old_str, new_str)
+
+            env_build.configure(args=args)
+            env_build.make()
+            env_build.make(args=['install'])
+
+    def build_windows(self):
+        with tools.chdir("sources"):
+            tools.replace_in_file("CMakeLists.txt", 'string(REGEX REPLACE "/MD" "/MT" ${var} "${${var}}")', "")
+            tools.replace_in_file("sharedlib/CMakeLists.txt",
+                                  'string(REGEX REPLACE "/MT" "/MD" ${var} "${${var}}")', "")
+
+            cmake_options = []
+            if self.options.shared:
+                cmake_options.append("-DENABLE_STATIC=0 -DENABLE_SHARED=1")
+            else:
+                cmake_options.append("-DENABLE_SHARED=0 -DENABLE_STATIC=1")
+            cmake_options.append("-DWITH_SIMD=%s" % "1" if self.options.SSE else "0")
+
+            cmake = CMake(self.settings)
+            self.run("mkdir _build")
+            cd_build = "cd _build"
+
+            self.run(
+                '%s && %s && cmake .. %s %s' % (env.command_line, cd_build, cmake.command_line, " ".join(cmake_options)))
+            self.run("%s && %s && cmake --build . %s" % (env.command_line, cd_build, cmake.build_config))
+
+    def build(self):
+        if self.settings.os == "Windows":
+            self.build_windows()
+        else:
+            self.build_configure()
+
     def package(self):
         # Copying headers
         self.copy("*.h", dst="include", src="sources")
