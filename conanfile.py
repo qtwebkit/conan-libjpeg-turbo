@@ -3,6 +3,7 @@
 
 from conans import ConanFile, CMake, AutoToolsBuildEnvironment, tools
 import os
+import shutil
 
 
 class LibJpegTurboConan(ConanFile):
@@ -13,7 +14,7 @@ class LibJpegTurboConan(ConanFile):
     settings = "os", "arch", "compiler", "build_type"
     options = {"shared": [True, False], "fPIC": [True, False], "SSE": [True, False]}
     default_options = "shared=False", "fPIC=True", "SSE=True"
-    exports = "CMakeLists.txt"
+    exports_sources = ["CMakeLists.txt"]
     url = "http://github.com/bincrafters/conan-libjpeg-turbo"
     license = "https://github.com/libjpeg-turbo/libjpeg-turbo/blob/%s/LICENSE.txt" % version
     install = "libjpeg-turbo-install"
@@ -34,6 +35,10 @@ class LibJpegTurboConan(ConanFile):
         self.output.info("trying download of url: " + download_url)
         tools.get(download_url)
         os.rename(archive_name, "sources")
+        shutil.move(os.path.join("sources", "CMakeLists.txt"),
+                    os.path.join("sources", "CMakeLists_original.txt"))
+        shutil.move("CMakeLists.txt",
+                    os.path.join("sources", "CMakeLists.txt"))
 
     def build_configure(self):
         prefix = os.path.abspath(self.install)
@@ -56,25 +61,31 @@ class LibJpegTurboConan(ConanFile):
             env_build.make(args=['install'])
 
     def build_windows(self):
-        with tools.chdir("sources"):
-            tools.replace_in_file("CMakeLists.txt", 'string(REGEX REPLACE "/MD" "/MT" ${var} "${${var}}")', "")
-            tools.replace_in_file("sharedlib/CMakeLists.txt",
-                                  'string(REGEX REPLACE "/MT" "/MD" ${var} "${${var}}")', "")
+        cmake = CMake(self)
+        cmake.definitions['ENABLE_STATIC'] = not self.options.shared
+        cmake.definitions['ENABLE_SHARED'] = self.options.shared
+        cmake.definitions['WITH_SIMD'] = self.options.SSE
+        cmake.configure(source_dir="sources")
+        cmake.build()
+        #with tools.chdir("sources"):
+        #    tools.replace_in_file("CMakeLists.txt", 'string(REGEX REPLACE "/MD" "/MT" ${var} "${${var}}")', "")
+        #    tools.replace_in_file("sharedlib/CMakeLists.txt",
+        #                          'string(REGEX REPLACE "/MT" "/MD" ${var} "${${var}}")', "")
 
-            cmake_options = []
-            if self.options.shared:
-                cmake_options.append("-DENABLE_STATIC=0 -DENABLE_SHARED=1")
-            else:
-                cmake_options.append("-DENABLE_SHARED=0 -DENABLE_STATIC=1")
-            cmake_options.append("-DWITH_SIMD=%s" % "1" if self.options.SSE else "0")
+        #    cmake_options = []
+        #    if self.options.shared:
+        #        cmake_options.append("-DENABLE_STATIC=0 -DENABLE_SHARED=1")
+        #    else:
+        #        cmake_options.append("-DENABLE_SHARED=0 -DENABLE_STATIC=1")
+        #    cmake_options.append("-DWITH_SIMD=%s" % "1" if self.options.SSE else "0")
 
-            cmake = CMake(self.settings)
-            self.run("mkdir _build")
-            cd_build = "cd _build"
+        #    cmake = CMake(self.settings)
+        #    self.run("mkdir _build")
+        #    cd_build = "cd _build"
 
-            self.run(
-                '%s && %s && cmake .. %s %s' % (env.command_line, cd_build, cmake.command_line, " ".join(cmake_options)))
-            self.run("%s && %s && cmake --build . %s" % (env.command_line, cd_build, cmake.build_config))
+        #    self.run(
+        #        '%s && %s && cmake .. %s %s' % (env.command_line, cd_build, cmake.command_line, " ".join(cmake_options)))
+        #    self.run("%s && %s && cmake --build . %s" % (env.command_line, cd_build, cmake.build_config))
 
     def build(self):
         if self.settings.os == "Windows":
@@ -84,11 +95,16 @@ class LibJpegTurboConan(ConanFile):
 
     def package(self):
         # Copying headers
+        if self.settings.os == "Windows":
+            self.copy("jconfig.h", dst="include", src=".")
+            if self.options.shared:
+                self.copy(pattern="*jpeg.lib", dst="lib", src="lib", keep_path=False)
+                self.copy(pattern="*turbojpeg.lib", dst="lib", src="lib", keep_path=False)
+            else:
+                self.copy(pattern="*jpeg-static.lib", dst="lib", src="lib", keep_path=False)
+                self.copy(pattern="*turbojpeg-static.lib", dst="lib", src="lib", keep_path=False)
         self.copy("*.h", dst="include", src="sources")
         self.copy(pattern="*.dll", dst="bin", src="sources", keep_path=False)
-        self.copy(pattern="*turbojpeg.lib", dst="lib", src="sources", keep_path=False)
-        self.copy(pattern="*jpeg.lib", dst="lib", src="sources", keep_path=False)
-        self.copy(pattern="*jpeg-static.lib", dst="lib", src="sources", keep_path=False)
         self.copy(pattern="*.dylib", dst="lib", src="sources", keep_path=False)
         self.copy(pattern="*.so*", dst="lib", src="sources", keep_path=False)
         self.copy(pattern="*.a", dst="lib", src="sources", keep_path=False)
