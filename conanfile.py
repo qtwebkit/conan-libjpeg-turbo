@@ -67,25 +67,6 @@ class LibJpegTurboConan(ConanFile):
         cmake.definitions['WITH_SIMD'] = self.options.SSE
         cmake.configure(source_dir="sources")
         cmake.build()
-        #with tools.chdir("sources"):
-        #    tools.replace_in_file("CMakeLists.txt", 'string(REGEX REPLACE "/MD" "/MT" ${var} "${${var}}")', "")
-        #    tools.replace_in_file("sharedlib/CMakeLists.txt",
-        #                          'string(REGEX REPLACE "/MT" "/MD" ${var} "${${var}}")', "")
-
-        #    cmake_options = []
-        #    if self.options.shared:
-        #        cmake_options.append("-DENABLE_STATIC=0 -DENABLE_SHARED=1")
-        #    else:
-        #        cmake_options.append("-DENABLE_SHARED=0 -DENABLE_STATIC=1")
-        #    cmake_options.append("-DWITH_SIMD=%s" % "1" if self.options.SSE else "0")
-
-        #    cmake = CMake(self.settings)
-        #    self.run("mkdir _build")
-        #    cd_build = "cd _build"
-
-        #    self.run(
-        #        '%s && %s && cmake .. %s %s' % (env.command_line, cd_build, cmake.command_line, " ".join(cmake_options)))
-        #    self.run("%s && %s && cmake --build . %s" % (env.command_line, cd_build, cmake.build_config))
 
     def build(self):
         if self.settings.os == "Windows":
