@@ -56,7 +56,21 @@ class LibJpegTurboConan(ConanFile):
                 new_str = r'-install_name \$soname'
                 tools.replace_in_file("configure", old_str, new_str)
 
-            env_build.configure(args=args)
+            if str(self.settings.os) in ['Macos', 'iOS', 'watchOS', 'tvOS']:
+                # TODO : workaround until conan 0.29
+                build_arch = {'x86': 'i686',
+                              'x86_64': 'x86_64'}.get(tools.detected_architecture())
+                host_arch = {'x86': 'i686',
+                             'x86_64': 'x86_64',
+                             'amrv8': 'arm64',
+                             'armv7': 'arm',
+                             'armv7s': 'arm',
+                             'armv7k': 'arm'}.get(str(self.settings.arch))
+                args.append('--host=%s-apple-darwin' % build_arch)
+                args.append('--build=%s-apple-darwin' % host_arch)
+                env_build.configure(args=args, host=None, build=None, target=None)
+            else:
+                env_build.configure(args=args)
             env_build.make()
             env_build.make(args=['install'])
 
