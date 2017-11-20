@@ -58,17 +58,18 @@ class LibJpegTurboConan(ConanFile):
 
             if str(self.settings.os) in ['Macos', 'iOS', 'watchOS', 'tvOS']:
                 # TODO : workaround until conan 0.29
-                build_arch = {'x86': 'i686',
-                              'x86_64': 'x86_64'}.get(tools.detected_architecture())
                 host_arch = {'x86': 'i686',
-                             'x86_64': 'x86_64',
-                             'amrv8': 'arm64',
-                             'armv7': 'arm',
-                             'armv7s': 'arm',
-                             'armv7k': 'arm'}.get(str(self.settings.arch))
+                             'x86_64': 'x86_64'}.get(tools.detected_architecture())
+                build_arch = {'x86': 'i686',
+                              'x86_64': 'x86_64',
+                              'amrv8': 'arm64',
+                              'armv7': 'arm',
+                              'armv7s': 'arm',
+                              'armv7k': 'arm'}.get(str(self.settings.arch))
                 args.append('--host=%s-apple-darwin' % build_arch)
                 args.append('--build=%s-apple-darwin' % host_arch)
-                env_build.configure(args=args, host=None, build=None, target=None)
+                with tools.environment_append(env_build.vars):
+                    self.run('./configure %s' % ' '.join(args))
             else:
                 env_build.configure(args=args)
             env_build.make()
