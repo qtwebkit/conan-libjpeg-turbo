@@ -10,13 +10,13 @@ class LibJpegTurboConan(ConanFile):
     name = "libjpeg-turbo"
     version = "1.5.2"
     description = "SIMD-accelerated libjpeg-compatible JPEG codec library"
-    generators = "cmake", "txt"
+    generators = "cmake"
+    url = "http://github.com/bincrafters/conan-libjpeg-turbo"
+    license = "https://raw.githubusercontent.com/libjpeg-turbo/libjpeg-turbo/master/LICENSE.md"
     settings = "os", "arch", "compiler", "build_type"
     options = {"shared": [True, False], "fPIC": [True, False], "SSE": [True, False]}
     default_options = "shared=False", "fPIC=True", "SSE=True"
-    exports_sources = ["CMakeLists.txt"]
-    url = "http://github.com/bincrafters/conan-libjpeg-turbo"
-    license = "https://github.com/libjpeg-turbo/libjpeg-turbo/blob/%s/LICENSE.txt" % version
+    exports_sources = ["CMakeLists.txt", "LICENSE"]
     install = "libjpeg-turbo-install"
     
     def config(self):
@@ -56,22 +56,7 @@ class LibJpegTurboConan(ConanFile):
                 new_str = r'-install_name \$soname'
                 tools.replace_in_file("configure", old_str, new_str)
 
-            if str(self.settings.os) in ['Macos', 'iOS', 'watchOS', 'tvOS']:
-                # TODO : workaround until conan 0.29
-                host_arch = {'x86': 'i686',
-                             'x86_64': 'x86_64'}.get(tools.detected_architecture())
-                build_arch = {'x86': 'i686',
-                              'x86_64': 'x86_64',
-                              'amrv8': 'arm64',
-                              'armv7': 'arm',
-                              'armv7s': 'arm',
-                              'armv7k': 'arm'}.get(str(self.settings.arch))
-                args.append('--host=%s-apple-darwin' % build_arch)
-                args.append('--build=%s-apple-darwin' % host_arch)
-                with tools.environment_append(env_build.vars):
-                    self.run('./configure %s' % ' '.join(args))
-            else:
-                env_build.configure(args=args)
+            env_build.configure(args=args)
             env_build.make()
             env_build.make(args=['install'])
 

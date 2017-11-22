@@ -1,8 +1,6 @@
-[![Download](https://api.bintray.com/packages/bincrafters/public-conan/libjpeg-turbo%3Abincrafters/images/download.svg?version=1.5.2%3Astable) ](https://bintray.com/bincrafters/public-conan/libjpeg-turbo%3Abincrafters/1.5.2%3Astable/link)
+[ ![Download](https://api.bintray.com/packages/bincrafters/public-conan/libjpeg-turbo%3Abincrafters/images/download.svg) ](https://bintray.com/bincrafters/public-conan/libjpeg-turbo%3Abincrafters/_latestVersion)
 [![Build Status](https://travis-ci.org/bincrafters/conan-libjpeg-turbo.svg?branch=stable%2F1.5.2)](https://travis-ci.org/bincrafters/conan-libjpeg-turbo)
-[![Build status](https://ci.appveyor.com/api/projects/status/a5snyovachh6e8nh?svg=true)](https://ci.appveyor.com/project/BinCrafters/conan-libjpeg-turbo)
-
-Brief statement describing libjpeg-turbo
+[![Build status](https://ci.appveyor.com/api/projects/status/u69w8tm6acm1pno3?svg=true)](https://ci.appveyor.com/project/BinCrafters/conan-libjpeg-turbo)
 
 [Conan.io](https://conan.io) package for [libjpeg-turbo](https://github.com/someauthor/libjpeg-turbo) project
 
@@ -49,4 +47,4 @@ The following command both runs all the steps of the conan file, and publishes t
     $ conan upload libjpeg-turbo/1.5.2@bincrafters/stable --all -r bincrafters
 
 ## License
-[LICENSE_TYPE](LICENSE)
+[BSD-3 and ZLIB](LICENSE)
