@@ -23,7 +23,7 @@ class LibJpegTurboConan(ConanFile):
         del self.settings.compiler.libcxx 
         
         if self.settings.os == "Windows":
-            self.requires.add("nasm/2.12.02@lasote/stable", private=True)
+            self.requires.add("nasm/2.12.02@conan/stable", private=True)
             self.options.remove("fPIC")
        
     def source(self):
