@@ -10,13 +10,14 @@ class LibJpegTurboConan(ConanFile):
     name = "libjpeg-turbo"
     version = "1.5.2"
     description = "SIMD-accelerated libjpeg-compatible JPEG codec library"
-    generators = "cmake"
     url = "http://github.com/bincrafters/conan-libjpeg-turbo"
-    license = "https://raw.githubusercontent.com/libjpeg-turbo/libjpeg-turbo/master/LICENSE.md"
+    license = "BSD 3-Clause, ZLIB"
+    exports = ["LICENSE.md"]
+    exports_sources = ["CMakeLists.txt"]
+    generators = "cmake"
     settings = "os", "arch", "compiler", "build_type"
     options = {"shared": [True, False], "fPIC": [True, False], "SSE": [True, False]}
     default_options = "shared=False", "fPIC=True", "SSE=True"
-    exports_sources = ["CMakeLists.txt", "LICENSE"]
     install = "libjpeg-turbo-install"
     
     def config(self):
