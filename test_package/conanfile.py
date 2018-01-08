@@ -16,7 +16,7 @@ class TestPackageConan(ConanFile):
 
     def test(self):
         with tools.environment_append(RunEnvironment(self).vars):
-            img_name = os.path.join(self.conanfile_directory, "testimg.jpg")
+            img_name = os.path.join(self.source_folder, "testimg.jpg")
             bin_path = os.path.join("bin", "test_package")
             command = "%s %s" % (bin_path, img_name)
             if self.settings.os == "Windows":
