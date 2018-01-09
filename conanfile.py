@@ -61,7 +61,7 @@ class LibJpegTurboConan(ConanFile):
             env_build.make()
             env_build.make(args=['install'])
 
-    def build_windows(self):
+    def build_cmake(self):
         cmake = CMake(self)
         cmake.definitions['ENABLE_STATIC'] = not self.options.shared
         cmake.definitions['ENABLE_SHARED'] = self.options.shared
@@ -70,14 +70,14 @@ class LibJpegTurboConan(ConanFile):
         cmake.build()
 
     def build(self):
-        if self.settings.os == "Windows":
-            self.build_windows()
+        if self.settings.compiler == "Visual Studio":
+            self.build_cmake()
         else:
             self.build_configure()
 
     def package(self):
         # Copying headers
-        if self.settings.os == "Windows":
+        if self.settings.compiler == "Visual Studio":
             self.copy("jconfig.h", dst="include", src=".")
             if self.options.shared:
                 self.copy(pattern="*jpeg.lib", dst="lib", src="lib", keep_path=False)
@@ -92,7 +92,7 @@ class LibJpegTurboConan(ConanFile):
         self.copy(pattern="*.a", dst="lib", src="sources", keep_path=False)
 
     def package_info(self):
-        if self.settings.os == "Windows":
+        if self.settings.compiler == "Visual Studio":
             if self.options.shared:
                 self.cpp_info.libs = ['jpeg', 'turbojpeg']
             else:
