@@ -45,8 +45,11 @@ class LibJpegTurboConan(ConanFile):
     def build_configure(self):
         prefix = os.path.abspath(self.install)
         with tools.chdir("sources"):
-            env_build = AutoToolsBuildEnvironment(self)
+            # works for unix and mingw environments
+            env_build = AutoToolsBuildEnvironment(self, win_bash=self.settings.os == 'Windows')
             env_build.fpic = self.options.fPIC
+            if self.settings.os == 'Windows':
+                prefix = tools.unix_path(prefix)
             args = ['--prefix=%s' % prefix]
             if self.options.shared:
                 args.extend(['--disable-static', '--enable-shared'])
