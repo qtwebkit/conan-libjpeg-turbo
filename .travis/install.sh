@@ -23,4 +23,5 @@ else
 fi
 
 pip install conan_package_tools # It install conan too
+pip install --upgrade 'conan>=1.0.0*'
 conan user
