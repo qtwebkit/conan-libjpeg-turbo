@@ -33,6 +33,11 @@ if __name__ == "__main__":
     
     builder = module.get_builder()
     
-    builder.run()
+    builds = []
+    for settings, options, env_vars, build_requires in builder.builds:
+        # skip mingw cross-builds
+        if not (platform.system() == "Windows" and settings["compiler"] == "gcc" and settings["arch"] == "x86"):
+            builds.append([settings, options, env_vars, build_requires])
+    builder.builds = builds
 
-    
+    builder.run()
