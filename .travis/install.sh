@@ -22,6 +22,7 @@ else
 	sudo apt-get install -y nasm autoconf dh-autoreconf
 fi
 
-pip install conan_package_tools # It install conan too
-pip install --upgrade 'conan>=1.0.0*'
+pip install conan --upgrade
+pip install conan_package_tools
+
 conan user
