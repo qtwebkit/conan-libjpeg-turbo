@@ -18,6 +18,7 @@ class LibJpegTurboConan(ConanFile):
     settings = "os", "arch", "compiler", "build_type"
     options = {"shared": [True, False], "fPIC": [True, False], "SSE": [True, False]}
     default_options = "shared=False", "fPIC=True", "SSE=True"
+    source_subfolder = "source_subfolder"
     install = "libjpeg-turbo-install"
     
     def build_requirements(self):
@@ -34,22 +35,16 @@ class LibJpegTurboConan(ConanFile):
             self.options.remove("fPIC")
        
     def source(self):
-        download_url_base = "http://downloads.sourceforge.net/project/libjpeg-turbo"
-        archive_prefix = "/" + self.version + "/"
-        archive_name = self.name + "-" + self.version
-        archive_ext = ".tar.gz"
-        download_url = download_url_base + archive_prefix + archive_name + archive_ext
-        self.output.info("trying download of url: " + download_url)
-        tools.get(download_url)
-        os.rename(archive_name, "sources")
-        shutil.move(os.path.join("sources", "CMakeLists.txt"),
-                    os.path.join("sources", "CMakeLists_original.txt"))
-        shutil.move("CMakeLists.txt",
-                    os.path.join("sources", "CMakeLists.txt"))
+        tools.get("http://downloads.sourceforge.net/project/libjpeg-turbo/%s/libjpeg-turbo-%s.tar.gz" % (self.version, self.version))
+        os.rename("libjpeg-turbo-%s" % self.version, self.source_subfolder)
+        os.rename(os.path.join(self.source_subfolder, "CMakeLists.txt"),
+                  os.path.join(self.source_subfolder, "CMakeLists_original.txt"))
+        shutil.copy("CMakeLists.txt",
+                    os.path.join(self.source_subfolder, "CMakeLists.txt"))
 
     def build_configure(self):
         prefix = os.path.abspath(self.install)
-        with tools.chdir("sources"):
+        with tools.chdir(self.source_subfolder):
             # works for unix and mingw environments
             env_build = AutoToolsBuildEnvironment(self, win_bash=self.settings.os == 'Windows')
             env_build.fpic = self.options.fPIC
@@ -62,9 +57,9 @@ class LibJpegTurboConan(ConanFile):
                 args.extend(['--disable-shared', '--enable-static'])
 
             if self.settings.os == "Macos":
-                old_str = r'-install_name \$rpath/\$soname'
-                new_str = r'-install_name \$soname'
-                tools.replace_in_file("configure", old_str, new_str)
+                tools.replace_in_file("configure",
+                                      r'-install_name \$rpath/\$soname',
+                                      r'-install_name \$soname')
 
             env_build.configure(args=args)
             env_build.make()
@@ -75,7 +70,7 @@ class LibJpegTurboConan(ConanFile):
         cmake.definitions['ENABLE_STATIC'] = not self.options.shared
         cmake.definitions['ENABLE_SHARED'] = self.options.shared
         cmake.definitions['WITH_SIMD'] = self.options.SSE
-        cmake.configure(source_dir="sources")
+        cmake.configure(source_dir=self.source_subfolder)
         cmake.build()
 
     def build(self):
@@ -94,11 +89,11 @@ class LibJpegTurboConan(ConanFile):
             else:
                 self.copy(pattern="*jpeg-static.lib", dst="lib", src="lib", keep_path=False)
                 self.copy(pattern="*turbojpeg-static.lib", dst="lib", src="lib", keep_path=False)
-        self.copy("*.h", dst="include", src="sources")
-        self.copy(pattern="*.dll", dst="bin", src="sources", keep_path=False)
-        self.copy(pattern="*.dylib", dst="lib", src="sources", keep_path=False)
-        self.copy(pattern="*.so*", dst="lib", src="sources", keep_path=False)
-        self.copy(pattern="*.a", dst="lib", src="sources", keep_path=False)
+        self.copy("*.h", dst="include", src=self.source_subfolder)
+        self.copy(pattern="*.dll", dst="bin", src=self.source_subfolder, keep_path=False)
+        self.copy(pattern="*.dylib", dst="lib", src=self.source_subfolder, keep_path=False)
+        self.copy(pattern="*.so*", dst="lib", src=self.source_subfolder, keep_path=False)
+        self.copy(pattern="*.a", dst="lib", src=self.source_subfolder, keep_path=False)
 
     def package_info(self):
         if self.settings.compiler == "Visual Studio":
