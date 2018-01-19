@@ -80,6 +80,7 @@ class LibJpegTurboConan(ConanFile):
             self.build_configure()
 
     def package(self):
+        self.copy("license*", src=self.source_subfolder, dst="licenses", ignore_case=True, keep_path=False)
         # Copying headers
         if self.settings.compiler == "Visual Studio":
             self.copy("jconfig.h", dst="include", src=".")
