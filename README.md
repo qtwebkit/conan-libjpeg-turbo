@@ -1,8 +1,8 @@
 ## Package Status
 
-| Bintray | Appveyor | Travis | 
-|---------|-----------|--------|
-|[![Download](https://api.bintray.com/packages/bincrafters/public-conan/libjpeg-turbo%3Abincrafters/images/download.svg)](https://bintray.com/bincrafters/public-conan/libjpeg-turbo%3Abincrafters/_latestVersion)|[![Build status](https://ci.appveyor.com/api/projects/status/u69w8tm6acm1pno3?svg=true)](https://ci.appveyor.com/project/BinCrafters/conan-libjpeg-turbo)|[![Build Status](https://travis-ci.org/bincrafters/conan-libjpeg-turbo.svg?branch=stable%2F1.5.2)](https://travis-ci.org/bincrafters/conan-libjpeg-turbo)|
+| Bintray | Windows | Linux | Macos |
+|---------|------------|--------|------|
+|[![Download](https://api.bintray.com/packages/bincrafters/public-conan/libjpeg-turbo%3Abincrafters/images/download.svg)](https://bintray.com/bincrafters/public-conan/libjpeg-turbo%3Abincrafters/_latestVersion)|[![Build status](https://ci.appveyor.com/api/projects/status/u69w8tm6acm1pno3?svg=true)](https://ci.appveyor.com/project/BinCrafters/conan-libjpeg-turbo)|[![Build Status](https://travis-ci.org/bincrafters/conan-libjpeg-turbo.svg?branch=stable%2F1.5.2)](https://travis-ci.org/bincrafters/conan-libjpeg-turbo)| [![CircleCI](https://circleci.com/gh/bincrafters/conan-libjpeg-turbo.svg?style=svg)](https://circleci.com/gh/bincrafters/conan-libjpeg-turbo) |
 
 ## Conan.io Information
 
