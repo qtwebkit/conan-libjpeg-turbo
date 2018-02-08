@@ -21,11 +21,6 @@ class LibJpegTurboConan(ConanFile):
     source_subfolder = "source_subfolder"
     install = "libjpeg-turbo-install"
     
-    def build_requirements(self):
-        if self.settings.os == "Windows" and self.settings.compiler != "Visual Studio":
-            self.build_requires("mingw_installer/1.0@conan/stable")
-            self.build_requires("msys2_installer/latest@bincrafters/stable")
-
     def config(self):
         del self.settings.compiler.libcxx 
         
