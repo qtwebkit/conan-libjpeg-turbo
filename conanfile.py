@@ -60,12 +60,18 @@ class LibJpegTurboConan(ConanFile):
             env_build.make(args=['install'])
 
     def build_cmake(self):
+        # fix cmake that gather install targets from the wrong dir
+        for bin_program in ['tjbench', 'cjpeg', 'djpeg', 'jpegtran']:
+            tools.replace_in_file("%s/CMakeLists_original.txt" % self.source_subfolder,
+                                  '${CMAKE_CURRENT_BINARY_DIR}/' + bin_program + '-static.exe',
+                                  '${CMAKE_CURRENT_BINARY_DIR}/bin/' + bin_program + '-static.exe')
         cmake = CMake(self)
         cmake.definitions['ENABLE_STATIC'] = not self.options.shared
         cmake.definitions['ENABLE_SHARED'] = self.options.shared
         cmake.definitions['WITH_SIMD'] = self.options.SSE
         cmake.configure(source_dir=self.source_subfolder)
         cmake.build()
+        cmake.install()
 
     def build(self):
         if self.settings.compiler == "Visual Studio":
