@@ -80,8 +80,19 @@ class LibJpegTurboConan(ConanFile):
             self.build_configure()
 
     def package(self):
+        # remove unneeded directories
         shutil.rmtree(os.path.join(self.package_folder, 'share', 'man'), ignore_errors=True)
         shutil.rmtree(os.path.join(self.package_folder, 'share', 'doc'), ignore_errors=True)
+        shutil.rmtree(os.path.join(self.package_folder, 'doc'), ignore_errors=True)
+
+        # remove binaries
+        for bin_program in ['cjpeg', 'djpeg', 'jpegtran', 'tjbench', 'wrjpgcom', 'rdjpgcom']:
+            for ext in ['', '.exe']:
+                try:
+                    os.remove(os.path.join(self.package_folder, 'bin', bin_program+ext))
+                except:
+                    pass
+
         self.copy("license*", src=self.source_subfolder, dst="licenses", ignore_case=True, keep_path=False)
         # Copying generated header
         if self.settings.compiler == "Visual Studio":
