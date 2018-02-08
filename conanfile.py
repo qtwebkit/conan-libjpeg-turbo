@@ -19,7 +19,6 @@ class LibJpegTurboConan(ConanFile):
     options = {"shared": [True, False], "fPIC": [True, False], "SSE": [True, False]}
     default_options = "shared=False", "fPIC=True", "SSE=True"
     source_subfolder = "source_subfolder"
-    install = "libjpeg-turbo-install"
     
     def config(self):
         del self.settings.compiler.libcxx 
@@ -38,7 +37,7 @@ class LibJpegTurboConan(ConanFile):
                     os.path.join(self.source_subfolder, "CMakeLists.txt"))
 
     def build_configure(self):
-        prefix = os.path.abspath(self.install)
+        prefix = os.path.abspath(self.package_folder)
         with tools.chdir(self.source_subfolder):
             # works for unix and mingw environments
             env_build = AutoToolsBuildEnvironment(self, win_bash=self.settings.os == 'Windows')
@@ -75,21 +74,12 @@ class LibJpegTurboConan(ConanFile):
             self.build_configure()
 
     def package(self):
+        shutil.rmtree(os.path.join(self.package_folder, 'share', 'man'), ignore_errors=True)
+        shutil.rmtree(os.path.join(self.package_folder, 'share', 'doc'), ignore_errors=True)
         self.copy("license*", src=self.source_subfolder, dst="licenses", ignore_case=True, keep_path=False)
-        # Copying headers
+        # Copying generated header
         if self.settings.compiler == "Visual Studio":
             self.copy("jconfig.h", dst="include", src=".")
-            if self.options.shared:
-                self.copy(pattern="*jpeg.lib", dst="lib", src="lib", keep_path=False)
-                self.copy(pattern="*turbojpeg.lib", dst="lib", src="lib", keep_path=False)
-            else:
-                self.copy(pattern="*jpeg-static.lib", dst="lib", src="lib", keep_path=False)
-                self.copy(pattern="*turbojpeg-static.lib", dst="lib", src="lib", keep_path=False)
-        self.copy("*.h", dst="include", src=self.source_subfolder)
-        self.copy(pattern="*.dll", dst="bin", src=self.source_subfolder, keep_path=False)
-        self.copy(pattern="*.dylib", dst="lib", src=self.source_subfolder, keep_path=False)
-        self.copy(pattern="*.so*", dst="lib", src=self.source_subfolder, keep_path=False)
-        self.copy(pattern="*.a", dst="lib", src=self.source_subfolder, keep_path=False)
 
     def package_info(self):
         if self.settings.compiler == "Visual Studio":
