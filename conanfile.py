@@ -11,6 +11,7 @@ class LibJpegTurboConan(ConanFile):
     version = "1.5.2"
     description = "SIMD-accelerated libjpeg-compatible JPEG codec library"
     url = "http://github.com/bincrafters/conan-libjpeg-turbo"
+    homepage = "https://libjpeg-turbo.org"
     license = "BSD 3-Clause, ZLIB"
     exports = ["LICENSE.md"]
     exports_sources = ["CMakeLists.txt"]
