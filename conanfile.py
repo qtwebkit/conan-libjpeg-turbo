@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from conans import ConanFile, CMake, AutoToolsBuildEnvironment, tools
 import os
 import shutil
+from conans import ConanFile, CMake, AutoToolsBuildEnvironment, tools
 
 
-class LibJpegTurboConan(ConanFile):
+class LibjpegTurboConan(ConanFile):
     name = "libjpeg-turbo"
     version = "1.5.2"
     description = "SIMD-accelerated libjpeg-compatible JPEG codec library"
@@ -20,15 +20,15 @@ class LibJpegTurboConan(ConanFile):
     options = {"shared": [True, False], "fPIC": [True, False], "SSE": [True, False]}
     default_options = "shared=False", "fPIC=True", "SSE=True"
     source_subfolder = "source_subfolder"
-    
+
     def config(self):
-        del self.settings.compiler.libcxx 
-        
+        del self.settings.compiler.libcxx
+
         if self.settings.os == "Windows":
             self.requires.add("nasm/2.13.01@conan/stable", private=True)
         if self.settings.compiler == "Visual Studio":
             self.options.remove("fPIC")
-       
+
     def source(self):
         tools.get("http://downloads.sourceforge.net/project/libjpeg-turbo/%s/libjpeg-turbo-%s.tar.gz" % (self.version, self.version))
         os.rename("libjpeg-turbo-%s" % self.version, self.source_subfolder)
