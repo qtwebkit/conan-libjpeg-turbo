@@ -21,7 +21,7 @@ class LibjpegTurboConan(ConanFile):
     default_options = "shared=False", "fPIC=True", "SSE=True"
     source_subfolder = "source_subfolder"
 
-    def config(self):
+    def configure(self):
         del self.settings.compiler.libcxx
 
         if self.settings.os == "Windows":
