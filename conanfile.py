@@ -19,7 +19,7 @@ class LibjpegTurboConan(ConanFile):
     settings = "os", "arch", "compiler", "build_type"
     options = {"shared": [True, False],
                "fPIC": [True, False],
-               "SSE": [True, False],
+               "SIMD": [True, False],
                "arithmetic_encoder": [True, False],
                "arithmetic_decoder": [True, False],
                "libjpeg7_compatibility": [True, False],
@@ -30,7 +30,7 @@ class LibjpegTurboConan(ConanFile):
                "enable12bit": [True, False]}
     default_options = "shared=False",\
                       "fPIC=True",\
-                      "SSE=True",\
+                      "SIMD=True",\
                       "arithmetic_encoder=True",\
                       "arithmetic_decoder=True",\
                       "libjpeg7_compatibility=True",\
@@ -70,6 +70,15 @@ class LibjpegTurboConan(ConanFile):
                 args.extend(['--disable-static', '--enable-shared'])
             else:
                 args.extend(['--disable-shared', '--enable-static'])
+            args.append('--with-jpeg7' if self.options.libjpeg7_compatibility else '--without-jpeg7')
+            args.append('--with-jpeg8' if self.options.libjpeg8_compatibility else '--without-jpeg8')
+            args.append('--with-arith-enc' if self.options.arithmetic_encoder else '--without-arith-enc')
+            args.append('--with-arith-dec' if self.options.arithmetic_decoder else '--without-arith-dec')
+            args.append('--with-turbojpeg' if self.options.turbojpeg else '--without-turbojpeg')
+            args.append('--with-mem-srcdst' if self.options.mem_src_dst else '--without-mem-srcdst')
+            args.append('--with-12bit' if self.options.enable12bit else '--without-12bit')
+            args.append('--with-java' if self.options.java else '--without-java')
+            args.append('--with-simd' if self.options.SIMD else '--without-simd')
 
             if self.settings.os == "Macos":
                 tools.replace_in_file("configure",
@@ -89,7 +98,7 @@ class LibjpegTurboConan(ConanFile):
         cmake = CMake(self)
         cmake.definitions['ENABLE_STATIC'] = not self.options.shared
         cmake.definitions['ENABLE_SHARED'] = self.options.shared
-        cmake.definitions['WITH_SIMD'] = self.options.SSE
+        cmake.definitions['WITH_SIMD'] = self.options.SIMD
         cmake.definitions['WITH_ARITH_ENC'] = self.options.arithmetic_encoder
         cmake.definitions['WITH_ARITH_DEC'] = self.options.arithmetic_decoder
         cmake.definitions['WITH_JPEG7'] = self.options.libjpeg7_compatibility
