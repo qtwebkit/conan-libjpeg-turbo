@@ -17,8 +17,28 @@ class LibjpegTurboConan(ConanFile):
     exports_sources = ["CMakeLists.txt"]
     generators = "cmake"
     settings = "os", "arch", "compiler", "build_type"
-    options = {"shared": [True, False], "fPIC": [True, False], "SSE": [True, False]}
-    default_options = "shared=False", "fPIC=True", "SSE=True"
+    options = {"shared": [True, False],
+               "fPIC": [True, False],
+               "SSE": [True, False],
+               "arithmetic_encoder": [True, False],
+               "arithmetic_decoder": [True, False],
+               "libjpeg7_compatibility": [True, False],
+               "libjpeg8_compatibility": [True, False],
+               "mem_src_dst": [True, False],
+               "turbojpeg": [True, False],
+               "java": [True, False],
+               "enable12bit": [True, False]}
+    default_options = "shared=False",\
+                      "fPIC=True",\
+                      "SSE=True",\
+                      "arithmetic_encoder=True",\
+                      "arithmetic_decoder=True",\
+                      "libjpeg7_compatibility=True",\
+                      "libjpeg8_compatibility=True",\
+                      "mem_src_dst=True",\
+                      "turbojpeg=True",\
+                      "java=False",\
+                      "enable12bit=False"
     source_subfolder = "source_subfolder"
 
     def configure(self):
@@ -70,6 +90,14 @@ class LibjpegTurboConan(ConanFile):
         cmake.definitions['ENABLE_STATIC'] = not self.options.shared
         cmake.definitions['ENABLE_SHARED'] = self.options.shared
         cmake.definitions['WITH_SIMD'] = self.options.SSE
+        cmake.definitions['WITH_ARITH_ENC'] = self.options.arithmetic_encoder
+        cmake.definitions['WITH_ARITH_DEC'] = self.options.arithmetic_decoder
+        cmake.definitions['WITH_JPEG7'] = self.options.libjpeg7_compatibility
+        cmake.definitions['WITH_JPEG8'] = self.options.libjpeg8_compatibility
+        cmake.definitions['WITH_MEM_SRCDST'] = self.options.mem_src_dst
+        cmake.definitions['WITH_TURBOJPEG'] = self.options.turbojpeg
+        cmake.definitions['WITH_JAVA'] = self.options.java
+        cmake.definitions['WITH_12BIT'] = self.options.enable12bit
         cmake.configure(source_dir=self.source_subfolder)
         cmake.build()
         cmake.install()
