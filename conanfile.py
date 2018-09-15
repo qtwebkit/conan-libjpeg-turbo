@@ -3,6 +3,7 @@
 
 import os
 import shutil
+import platform
 from conans import ConanFile, CMake, AutoToolsBuildEnvironment, tools
 
 
@@ -62,7 +63,8 @@ class LibjpegTurboConan(ConanFile):
         prefix = os.path.abspath(self.package_folder)
         with tools.chdir(self.source_subfolder):
             # works for unix and mingw environments
-            env_build = AutoToolsBuildEnvironment(self, win_bash=self.settings.os == 'Windows')
+            env_build = AutoToolsBuildEnvironment(self, win_bash=self.settings.os == 'Windows' and
+                                                  platform.system() == 'Windows')
             env_build.fpic = self.options.fPIC
             if self.settings.os == 'Windows':
                 prefix = tools.unix_path(prefix)
