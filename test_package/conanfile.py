@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from conans import ConanFile, CMake, tools, RunEnvironment
+from conans import ConanFile, CMake
 import os
 
 
@@ -20,7 +20,5 @@ class TestPackageConan(ConanFile):
         cmake.build()
 
     def test(self):
-        img_name = os.path.join(self.source_folder, "testimg.jpg")
         bin_path = os.path.join("bin", "test_package")
-        command = "%s %s" % (bin_path, img_name)
-        self.run(command, run_environment=True)
+        self.run(bin_path, run_environment=True)
