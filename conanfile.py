@@ -30,18 +30,8 @@ class LibjpegTurboConan(ConanFile):
                "turbojpeg": [True, False],
                "java": [True, False],
                "enable12bit": [True, False]}
-    default_options = "shared=False",\
-                      "fPIC=True",\
-                      "SIMD=True",\
-                      "arithmetic_encoder=True",\
-                      "arithmetic_decoder=True",\
-                      "libjpeg7_compatibility=True",\
-                      "libjpeg8_compatibility=True",\
-                      "mem_src_dst=True",\
-                      "turbojpeg=True",\
-                      "java=False",\
-                      "enable12bit=False"
-    source_subfolder = "source_subfolder"
+    default_options = {'shared': False, 'fPIC': True, 'SIMD': True, 'arithmetic_encoder': True, 'arithmetic_decoder': True, 'libjpeg7_compatibility': True, 'libjpeg8_compatibility': True, 'mem_src_dst': True, 'turbojpeg': True, 'java': False, 'enable12bit': False}
+    _source_subfolder = "source_subfolder"
 
     def configure(self):
         del self.settings.compiler.libcxx
@@ -53,15 +43,15 @@ class LibjpegTurboConan(ConanFile):
 
     def source(self):
         tools.get("http://downloads.sourceforge.net/project/libjpeg-turbo/%s/libjpeg-turbo-%s.tar.gz" % (self.version, self.version))
-        os.rename("libjpeg-turbo-%s" % self.version, self.source_subfolder)
-        os.rename(os.path.join(self.source_subfolder, "CMakeLists.txt"),
-                  os.path.join(self.source_subfolder, "CMakeLists_original.txt"))
+        os.rename("libjpeg-turbo-%s" % self.version, self._source_subfolder)
+        os.rename(os.path.join(self._source_subfolder, "CMakeLists.txt"),
+                  os.path.join(self._source_subfolder, "CMakeLists_original.txt"))
         shutil.copy("CMakeLists.txt",
-                    os.path.join(self.source_subfolder, "CMakeLists.txt"))
+                    os.path.join(self._source_subfolder, "CMakeLists.txt"))
 
     def build_configure(self):
         prefix = os.path.abspath(self.package_folder)
-        with tools.chdir(self.source_subfolder):
+        with tools.chdir(self._source_subfolder):
             # works for unix and mingw environments
             env_build = AutoToolsBuildEnvironment(self, win_bash=self.settings.os == 'Windows' and
                                                   platform.system() == 'Windows')
@@ -95,7 +85,7 @@ class LibjpegTurboConan(ConanFile):
     def build_cmake(self):
         # fix cmake that gather install targets from the wrong dir
         for bin_program in ['tjbench', 'cjpeg', 'djpeg', 'jpegtran']:
-            tools.replace_in_file("%s/CMakeLists_original.txt" % self.source_subfolder,
+            tools.replace_in_file("%s/CMakeLists_original.txt" % self._source_subfolder,
                                   '${CMAKE_CURRENT_BINARY_DIR}/' + bin_program + '-static.exe',
                                   '${CMAKE_CURRENT_BINARY_DIR}/bin/' + bin_program + '-static.exe')
         cmake = CMake(self)
@@ -110,7 +100,7 @@ class LibjpegTurboConan(ConanFile):
         cmake.definitions['WITH_TURBOJPEG'] = self.options.turbojpeg
         cmake.definitions['WITH_JAVA'] = self.options.java
         cmake.definitions['WITH_12BIT'] = self.options.enable12bit
-        cmake.configure(source_dir=self.source_subfolder)
+        cmake.configure(source_dir=self._source_subfolder)
         cmake.build()
         cmake.install()
 
@@ -134,7 +124,7 @@ class LibjpegTurboConan(ConanFile):
                 except:
                     pass
 
-        self.copy("license*", src=self.source_subfolder, dst="licenses", ignore_case=True, keep_path=False)
+        self.copy("license*", src=self._source_subfolder, dst="licenses", ignore_case=True, keep_path=False)
         # Copying generated header
         if self.settings.compiler == "Visual Studio":
             self.copy("jconfig.h", dst="include", src=".")
