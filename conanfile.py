@@ -72,6 +72,8 @@ class LibjpegTurboConan(ConanFile):
             args.append('--with-12bit' if self.options.enable12bit else '--without-12bit')
             args.append('--with-java' if self.options.java else '--without-java')
             args.append('--with-simd' if self.options.SIMD else '--without-simd')
+            if self.options.fPIC:
+                args.append('--with-pic')
 
             if self.settings.os == "Macos":
                 tools.replace_in_file("configure",
