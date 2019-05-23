@@ -40,6 +40,8 @@ class LibjpegTurboConan(ConanFile):
             self.requires.add("nasm/2.13.01@conan/stable", private=True)
         if self.settings.compiler == "Visual Studio":
             self.options.remove("fPIC")
+        if self.settings.os == "Emscripten":
+            del self.options.SIMD
 
     def source(self):
         tools.get("http://downloads.sourceforge.net/project/libjpeg-turbo/%s/libjpeg-turbo-%s.tar.gz" % (self.version, self.version))
@@ -48,6 +50,13 @@ class LibjpegTurboConan(ConanFile):
                   os.path.join(self._source_subfolder, "CMakeLists_original.txt"))
         shutil.copy("CMakeLists.txt",
                     os.path.join(self._source_subfolder, "CMakeLists.txt"))
+
+
+    @property
+    def _simd(self):
+        if self.settings.os == "Emscripten":
+            return False
+        return self.options.SIMD
 
     def build_configure(self):
         prefix = os.path.abspath(self.package_folder)
@@ -93,7 +102,7 @@ class LibjpegTurboConan(ConanFile):
         cmake = CMake(self)
         cmake.definitions['ENABLE_STATIC'] = not self.options.shared
         cmake.definitions['ENABLE_SHARED'] = self.options.shared
-        cmake.definitions['WITH_SIMD'] = self.options.SIMD
+        cmake.definitions['WITH_SIMD'] = self._simd
         cmake.definitions['WITH_ARITH_ENC'] = self.options.arithmetic_encoder
         cmake.definitions['WITH_ARITH_DEC'] = self.options.arithmetic_decoder
         cmake.definitions['WITH_JPEG7'] = self.options.libjpeg7_compatibility
