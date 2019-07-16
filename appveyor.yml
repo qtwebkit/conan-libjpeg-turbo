@@ -22,8 +22,10 @@ environment:
           CONAN_BUILD_TYPES: Release
           CONAN_VISUAL_RUNTIMES: MD
         - MINGW_CONFIGURATIONS: '7@x86@dwarf2@posix'
+          CONAN_BUILD_REQUIRES: 'msys2_installer/latest@bincrafters/stable'
           CONAN_BUILD_TYPES: Release
         - MINGW_CONFIGURATIONS: '7@x86_64@seh@posix'
+          CONAN_BUILD_REQUIRES: 'msys2_installer/latest@bincrafters/stable'
           CONAN_BUILD_TYPES: Release
 
 install:
