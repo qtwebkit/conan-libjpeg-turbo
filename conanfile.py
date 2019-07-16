@@ -70,7 +70,7 @@ class LibjpegTurboConan(ConanFile):
         return self.options.SIMD
 
     def _configure_cmake(self):
-        cmake = CMake(self)
+        cmake = CMake(self, set_cmake_flags=True)
         cmake.definitions['ENABLE_STATIC'] = not self.options.shared
         cmake.definitions['ENABLE_SHARED'] = self.options.shared
         cmake.definitions['WITH_SIMD'] = self._simd
