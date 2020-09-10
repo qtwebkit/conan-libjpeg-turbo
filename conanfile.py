@@ -8,7 +8,7 @@ from conans import ConanFile, CMake, tools
 
 class LibjpegTurboConan(ConanFile):
     name = "libjpeg-turbo"
-    version = "2.0.3"
+    version = "2.0.5"
     description = "SIMD-accelerated libjpeg-compatible JPEG codec library"
     topics = ("conan", "jpeg", "libjpeg", "image", "multimedia", "format", "graphics")
     url = "http://github.com/bincrafters/conan-libjpeg-turbo"
@@ -56,7 +56,7 @@ class LibjpegTurboConan(ConanFile):
 
     def source(self):
         tools.get("https://github.com/libjpeg-turbo/libjpeg-turbo/archive/%s.tar.gz" % self.version,
-                  sha256="a69598bf079463b34d45ca7268462a18b6507fdaa62bb1dfd212f02041499b5d")
+                  sha256="b3090cd37b5a8b3e4dbd30a1311b3989a894e5d3c668f14cbc6739d77c9402b7")
         os.rename("libjpeg-turbo-%s" % self.version, self._source_subfolder)
         os.rename(os.path.join(self._source_subfolder, "CMakeLists.txt"),
                   os.path.join(self._source_subfolder, "CMakeLists_original.txt"))
