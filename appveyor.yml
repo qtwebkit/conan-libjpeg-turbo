@@ -21,6 +21,10 @@ environment:
           CONAN_BUILD_TYPES: Release
         - MINGW_CONFIGURATIONS: '7@x86_64@seh@posix'
           CONAN_BUILD_TYPES: Release
+        - MINGW_CONFIGURATIONS: '8@x86@dwarf2@posix'
+          CONAN_BUILD_TYPES: Release
+        - MINGW_CONFIGURATIONS: '8@x86_64@seh@posix'
+          CONAN_BUILD_TYPES: Release
 
 install:
   - set PATH=%PYTHON_HOME%;%PYTHON_HOME%/Scripts/;%PATH%
