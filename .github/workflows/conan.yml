@@ -1,0 +1,40 @@
+name: conan
+on: [push, pull_request]
+
+env:
+  CONAN_PASSWORD: ${{ secrets.CONAN_PASSWORD }}
+
+jobs:
+  build:
+    name: ${{ matrix.config.name }}
+    runs-on: ${{ matrix.config.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - { name: "VS2019 Release", os: windows-latest,
+              env: { CONAN_VISUAL_VERSIONS: 16, CONAN_BUILD_TYPES: "Release" } }
+          - { name: "VS2019 Debug", os: windows-latest,
+              env: { CONAN_VISUAL_VERSIONS: 16, CONAN_BUILD_TYPES: "Debug" } }
+          - { name: "MinGW x86 Release", os: windows-latest,
+              env: { MINGW_CONFIGURATIONS: "8@x86@dwarf2@posix", CONAN_BUILD_TYPES: "Release" } }
+          - { name: "MinGW x86_64 Release", os: windows-latest,
+              env: { MINGW_CONFIGURATIONS: "8@x86_64@seh@posix", CONAN_BUILD_TYPES: "Release" } }
+
+    steps:
+      - name: Disable autocrlf
+        run: |
+          git config --global core.autocrlf false
+      - uses: actions/checkout@v2
+        with:
+          submodules: recursive
+      - uses: actions/setup-python@v1
+        with:
+          python-version: "3.8"
+      - name: Install Conan
+        run: |
+          conan-shared-scripts\install_conan.bat
+      - name: build
+        env: ${{ matrix.config.env }}
+        run: |
+          python conan-shared-scripts/build.py --static
