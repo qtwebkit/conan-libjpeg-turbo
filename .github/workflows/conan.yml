@@ -20,6 +20,8 @@ jobs:
               env: { MINGW_CONFIGURATIONS: "8@x86@dwarf2@posix", CONAN_BUILD_TYPES: "Release" } }
           - { name: "MinGW x86_64 Release", os: windows-latest,
               env: { MINGW_CONFIGURATIONS: "8@x86_64@seh@posix", CONAN_BUILD_TYPES: "Release" } }
+          - { name: "Xcode 11 Release", os: macos-latest,
+              env: { CONAN_APPLE_CLANG_VERSIONS: "11.0", CONAN_BUILD_TYPES: "Release", CONAN_ARCHS: x86_64 } }
 
     steps:
       - name: Disable autocrlf
@@ -31,9 +33,14 @@ jobs:
       - uses: actions/setup-python@v1
         with:
           python-version: "3.8"
-      - name: Install Conan
+      - name: Install Conan (Windows)
+        if: runner.os == 'Windows'
         run: |
           conan-shared-scripts\install_conan.bat
+      - name: Install Conan (Unix)
+        if: runner.os != 'Windows'
+        run: |
+          conan-shared-scripts/install_conan.sh
       - name: build
         env: ${{ matrix.config.env }}
         run: |
